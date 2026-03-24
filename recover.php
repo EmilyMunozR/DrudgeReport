@@ -1,13 +1,6 @@
 <?php
 include("db.php");
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require_once __DIR__ . '/PHPMailer/src/Exception.php';
-require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
-require_once __DIR__ . '/PHPMailer/src/SMTP.php';
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $token = bin2hex(random_bytes(16));
@@ -19,29 +12,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sss", $token, $exp, $email);
     $stmt->execute();
 
-    // Configurar PHPMailer con Mailjet
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'in-v3.mailjet.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'c1919fabf503647e15db231010b5ec05';   // tu API Key pública de Mailjet
-        $mail->Password = '4df00d457145f622ba7129c21b034603';   // tu API Key secreta de Mailjet
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+    // Configuración Mailjet API
+    $mj_url = 'https://api.mailjet.com/v3.1/send';
+    $mj_api_key = 'c1919fabf503647e15db231010b5ec05';
+    $mj_api_secret = '4df00d457145f622ba7129c21b034603';
 
-        $mail->setFrom('emilymunoz1018@gmail.com', 'DrudgeReport');
-        $mail->addAddress($email);
+    $data = [
+        'Messages' => [[
+            'From' => [
+                'Email' => 'emilymunoz1018@gmail.com', // remitente verificado en Mailjet
+                'Name'  => 'DrudgeReport'
+            ],
+            'To' => [[
+                'Email' => $email
+            ]],
+            'Subject' => 'Recuperación de contraseña',
+            'HTMLPart' => "Haz clic en el siguiente enlace para resetear tu contraseña: 
+                           <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>"
+        ]]
+    ];
 
-        $mail->isHTML(true);
-        $mail->Subject = 'Recuperación de contraseña';
-        $mail->Body    = "Haz clic en el siguiente enlace para resetear tu contraseña: 
-                          <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>";
+    // Enviar petición HTTP con cURL
+    $ch = curl_init($mj_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_USERPWD, "$mj_api_key:$mj_api_secret");
 
-        $mail->send();
+    $response = curl_exec($ch);
+    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http_status == 200) {
         echo "📩 Correo enviado a $email";
-    } catch (Exception $e) {
-        echo "❌ Error al enviar correo: {$mail->ErrorInfo}";
+    } else {
+        echo "❌ Error al enviar correo. Respuesta: " . $response;
     }
 }
 ?>

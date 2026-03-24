@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->isHTML(true);
         $mail->Subject = 'Recuperación de contraseña';
         $mail->Body    = "Haz clic en el siguiente enlace para resetear tu contraseña: 
-                          <a href='http://127.0.0.1/DrudgeReport/reset.php?token=$token'>Resetear contraseña</a>";
+                          <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>";
 
         $mail->send();
         echo "📩 Correo enviado a $email";

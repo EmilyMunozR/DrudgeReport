@@ -20,17 +20,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = [
         'Messages' => [[
             'From' => [
-                'Email' => 'emilymunoz1018@gmail.com', // remitente verificado en Mailjet
+                'Email' => 'emilymunoz1018@gmail.com', // debe estar verificado en Mailjet
                 'Name'  => 'DrudgeReport'
             ],
-            'To' => [[
-                'Email' => $email
-            ]],
+            'To' => [[ 'Email' => $email ]],
             'Subject' => 'Recuperación de contraseña',
-            'HTMLPart' => "Haz clic en el siguiente enlace para resetear tu contraseña: 
+            'TextPart' => 'Haz clic en el enlace para resetear tu contraseña',
+            'HTMLPart' => "Haz clic en el siguiente enlace: 
                            <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>"
         ]]
     ];
+
 
     // Enviar petición HTTP con cURL
     $ch = curl_init($mj_url);

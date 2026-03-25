@@ -17,34 +17,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mj_api_key = 'c1919fabf503647e15db231010b5ec05';
     $mj_api_secret = '4df00d457145f622ba7129c21b034603';
 
-   $data = [
-        'Messages' => [[
-            'From' => [
-                'Email' => 'emilymunoz1018@gmail.com', // debe estar verificado en Mailjet
-                'Name'  => 'DrudgeReport'
-            ],
-            'To' => [[ 'Email' => $email ]],
-            'Subject' => 'Recuperación de contraseña',
-            'TextPart' => 'Haz clic en el enlace para resetear tu contraseña',
-            'HTMLPart' => "Haz clic en el siguiente enlace: 
-                           <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>"
-        ]]
+    $data = [
+        'Messages' => [
+            [
+                'From' => [
+                    'Email' => 'emilymunoz1018@gmail.com', // remitente verificado en Mailjet
+                    'Name'  => 'DrudgeReport'
+                ],
+                'To' => [
+                    [
+                        'Email' => $email
+                    ]
+                ],
+                'Subject' => 'Recuperación de contraseña',
+                'TextPart' => 'Haz clic en el enlace para resetear tu contraseña',
+                'HTMLPart' => "Haz clic en el siguiente enlace para resetear tu contraseña: 
+                               <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>"
+            ]
+        ]
     ];
-    
+
+    // Enviar petición HTTP con cURL
     $ch = curl_init($mj_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_USERPWD, "$mj_api_key:$mj_api_secret");
-    
+
     $response = curl_exec($ch);
     $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
-    echo "HTTP Status: $http_status\n";
-    echo "Response: $response\n";
 
+    echo "HTTP Status: $http_status<br>";
+    echo "Response: $response<br>";
+
+    if ($http_status == 200) {
+        echo "📩 Correo enviado a $email";
+    } else {
+        echo "❌ Error al enviar correo. Respuesta: " . $response;
+    }
+}
 ?>
 <form method="post">
     <label>Usuario/Correo:</label><input type="text" name="email" required>

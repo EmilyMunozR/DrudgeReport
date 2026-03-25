@@ -12,38 +12,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sss", $token, $exp, $email);
     $stmt->execute();
 
-    // Configuración Mailjet API
-    $mj_url = 'https://api.mailjet.com/v3.1/send';
-    $mj_api_key = 'c1919fabf503647e15db231010b5ec05';
-    $mj_api_secret = '4df00d457145f622ba7129c21b034603';
+    // Configuración Resend API
+    $resend_url = 'https://api.resend.com/emails';
+    $resend_api_key = 're_RTtZCZR6_3QpKu3Xamwna1yzAUyUrYzi3'; // pega aquí tu API Key
 
     $data = [
-        'Messages' => [
-            [
-                'From' => [
-                    'Email' => 'emilymunoz1018@gmail.com', // remitente verificado en Mailjet
-                    'Name'  => 'DrudgeReport'
-                ],
-                'To' => [
-                    [
-                        'Email' => $email
-                    ]
-                ],
-                'Subject' => 'Recuperación de contraseña',
-                'TextPart' => 'Haz clic en el enlace para resetear tu contraseña',
-                'HTMLPart' => "Haz clic en el siguiente enlace para resetear tu contraseña: 
-                               <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>"
-            ]
-        ]
+        "from" => "onboarding@resend.dev", // remitente compartido de Resend
+        "to" => $email,                     // destinatario: el usuario que pidió recuperar contraseña
+        "subject" => "Recuperación de contraseña",
+        "html" => "Haz clic en el siguiente enlace para resetear tu contraseña: 
+                   <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>"
     ];
 
     // Enviar petición HTTP con cURL
-    $ch = curl_init($mj_url);
+    $ch = curl_init($resend_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_USERPWD, "$mj_api_key:$mj_api_secret");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $resend_api_key
+    ]);
 
     $response = curl_exec($ch);
     $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -51,12 +40,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     echo "HTTP Status: $http_status<br>";
     echo "Response: $response<br>";
-
-    if ($http_status == 200) {
-        echo "📩 Correo enviado a $email";
-    } else {
-        echo "❌ Error al enviar correo. Respuesta: " . $response;
-    }
 }
 ?>
 <form method="post">

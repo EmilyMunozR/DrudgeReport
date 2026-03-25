@@ -1,48 +1,40 @@
 <?php
-session_start();
-require_once 'PHPGangsta/GoogleAuthenticator.php';
 include("db.php");
+require 'vendor/autoload.php';
+use OTPHP\TOTP;
 
-if (!isset($_SESSION['user_id'])) {
-    die("No hay sesión activa. Vuelve a iniciar sesión.");
+session_start();
+if (!isset($_SESSION["username"])) {
+    header("Location: login.php");
+    exit;
 }
 
-$sql = "SELECT mfa_secret FROM auth_users WHERE id=?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $_SESSION['user_id']);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-if (!$user || empty($user['mfa_secret'])) {
-    die("No hay MFA configurado para este usuario.");
-}
-
-$secret = $user['mfa_secret'];
-$ga = new PHPGangsta_GoogleAuthenticator();
+$username = $_SESSION["username"];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $code = $_POST["code"];
-    $checkResult = $ga->verifyCode($secret, $code, 4); // tolerancia de 4 intervalos (~2 minutos)
+    $codigoIngresado = $_POST["codigo"];
 
-    if ($checkResult) {
+    $sql = "SELECT mfa_secret FROM auth_users WHERE username=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $secret = $row["mfa_secret"];
+
+    $totp = TOTP::create($secret);
+    if ($totp->verify($codigoIngresado)) {
+        $_SESSION["authenticated"] = true;
         header("Location: dashboard.php");
         exit;
     } else {
-        $error = "❌ Código incorrecto";
+        echo "❌ Código incorrecto.";
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Verificación MFA</title></head>
-<body>
-    <h2>Autenticación Multifactor</h2>
-    <p>Introduce el código de 6 dígitos de tu app Google Authenticator.</p>
-    <?php if(isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
-    <form method="post">
-        <label>Código MFA:</label><input type="text" name="code" required>
-        <button type="submit">Confirmar</button>
-    </form>
-</body>
-</html>
+
+<form method="post">
+    <label>Código de 6 dígitos:</label>
+    <input type="text" name="codigo" required>
+    <button type="submit">Verificar</button>
+</form>

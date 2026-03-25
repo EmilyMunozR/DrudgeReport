@@ -5,7 +5,13 @@ require 'phpqrcode/qrlib.php';
 
 use Base32\Base32;
 
-$username = "usuario_demo";
+session_start();
+if (!isset($_SESSION["username"])) {
+    header("Location: login.php");
+    exit;
+}
+
+$username = $_SESSION["username"];
 
 // Generar secreto nuevo
 $secret = Base32::encode(random_bytes(10));
@@ -21,5 +27,6 @@ $issuer = urlencode("MiAppSegura");
 $url = "otpauth://totp/{$issuer}:{$username}?secret={$secret}&issuer={$issuer}";
 
 // Mostrar QR
+header('Content-Type: image/png');
 QRcode::png($url);
 ?>

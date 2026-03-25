@@ -1,40 +1,40 @@
 <?php
 include("db.php");
 
-if (isset($_GET["token"])) {
+if (isset($_GET["token"]) && isset($_GET["username"])) {
     $token = $_GET["token"];
+    $username = $_GET["username"];
 
-    $sql = "SELECT * FROM auth_users WHERE reset_token=? AND reset_expiration > NOW()";
+    // Buscar token en BD
+    $sql = "SELECT reset_expiration FROM auth_users WHERE username=? AND reset_token=?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $token);
+    $stmt->bind_param("ss", $username, $token);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result->num_rows == 1) {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $newPass = password_hash($_POST["newPassword"], PASSWORD_DEFAULT);
-
-            $sql = "UPDATE auth_users SET password_hash=?, reset_token=NULL, reset_expiration=NULL WHERE reset_token=?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $newPass, $token);
-            $stmt->execute();
-
-            echo "✅ Contraseña actualizada correctamente. <a href='login.php'>Inicia sesión</a>";
+    if ($row = $result->fetch_assoc()) {
+        $exp = $row["reset_expiration"];
+        if (strtotime($exp) > time()) {
+            // Token válido → mostrar formulario para nueva contraseña
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $newpass = password_hash($_POST["newpass"], PASSWORD_DEFAULT);
+                $sql = "UPDATE auth_users SET password=?, reset_token=NULL, reset_expiration=NULL WHERE username=?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ss", $newpass, $username);
+                $stmt->execute();
+                echo "✅ Contraseña actualizada correctamente.";
+            } else {
+                echo '<form method="post">
+                        <label>Nueva contraseña:</label>
+                        <input type="password" name="newpass" required>
+                        <button type="submit">Cambiar contraseña</button>
+                      </form>';
+            }
+        } else {
+            echo "❌ Token expirado.";
         }
     } else {
-        echo "❌ Token inválido o expirado.";
+        echo "❌ Token inválido.";
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Resetear contraseña</title></head>
-<body>
-    <h2>Restablecer contraseña</h2>
-    <form method="post">
-        <label>Nueva contraseña:</label>
-        <input type="password" name="newPassword" required>
-        <button type="submit">Actualizar</button>
-    </form>
-</body>
-</html>

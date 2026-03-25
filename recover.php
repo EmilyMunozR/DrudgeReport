@@ -8,9 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $exp = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
     // Guardar token en BD para ese usuario
-    $sql = "UPDATE auth_users SET reset_token=?, reset_expiration=? WHERE username=? AND email=?";
+    $sql = "UPDATE auth_users SET reset_token=?, reset_expiration=? WHERE username=?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssss", $token, $exp, $username, $email);
+    $stmt->bind_param("ssss", $token, $exp, $username);
     $stmt->execute();
 
     // Configuración Resend API

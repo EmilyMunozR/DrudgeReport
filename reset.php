@@ -18,7 +18,9 @@ if (isset($_GET["token"]) && isset($_GET["username"])) {
             // Token válido → mostrar formulario para nueva contraseña
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $newpass = password_hash($_POST["newpass"], PASSWORD_DEFAULT);
-                $sql = "UPDATE auth_users SET password=?, reset_token=NULL, reset_expiration=NULL WHERE username=?";
+                $sql = "UPDATE auth_users 
+                        SET password_hash=?, reset_token=NULL, reset_expiration=NULL 
+                        WHERE username=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("ss", $newpass, $username);
                 $stmt->execute();

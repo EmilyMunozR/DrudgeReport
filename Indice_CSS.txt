@@ -1,0 +1,85 @@
+============================================
+RESUMEN DE SECCIONES - style.css
+============================================
+
+📁 SECCIÓN 1: VARIABLES GLOBALES (líneas 1-11)
+   Define todos los colores del sitio:
+   --bg-color        → Fondo general
+   --card-bg         → Fondo de tarjetas y contenedores
+   --text-black      → Color principal de texto
+   --text-gray       → Color secundario de texto
+   --accent-red      → Rojo Drudge para elementos destacados
+   --link-blue       → Color para enlaces al pasar el mouse
+   --border-color    → Color de bordes
+
+📁 SECCIÓN 2: RESET Y ESTILOS BASE (líneas 13-36)
+   Reset de márgenes, box-sizing, estilos de body y enlaces
+
+📁 SECCIÓN 3: HEADER (ENCABEZADO) (líneas 38-74)
+   Logo, fecha, encabezado sticky (pegajoso)
+
+📁 SECCIÓN 4: CONTROLES DE SESIÓN (líneas 76-134)
+   Botones de login/logout, nombre de usuario, animación de saludo
+
+📁 SECCIÓN 5: GRID PRINCIPAL (líneas 136-141)
+   Layout de 3 columnas para el contenido principal
+
+📁 SECCIÓN 6: COLUMNA CENTRAL (líneas 143-185)
+   Noticia principal, imagen con filtro vintage, títulos grandes
+
+📁 SECCIÓN 7: COLUMNAS LATERALES (líneas 187-235)
+   Listas de noticias, grupos de enlaces, efecto urgente (⚡)
+
+📁 SECCIÓN 8: TICKER INFERIOR (líneas 237-260)
+   Banda deslizante con noticias en la parte inferior
+
+📁 SECCIÓN 9: FOOTER (PIE DE PÁGINA) (líneas 262-306)
+   Secciones: Acerca de, Suscripción, Ubicación
+
+📁 SECCIÓN 10: BARRA DE HERRAMIENTAS (líneas 308-312)
+   Contenedor de los switches (tema e idioma)
+
+📁 SECCIÓN 11: SWITCH DE TEMA (líneas 314-328)
+   Switch para cambiar entre modo claro/oscuro
+
+📁 SECCIÓN 12: SWITCH DE IDIOMA (líneas 330-372)
+   Switch para cambiar entre ES (español) y EN (inglés)
+   Con perilla que se desliza y texto ES/EN a los lados
+
+📁 SECCIÓN 13: FORMULARIO DE SUSCRIPCIÓN (líneas 374-409)
+   Formulario desplegable para suscribirse al newsletter
+
+📁 SECCIÓN 14: MODO OSCURO (DARK MODE) (líneas 411-483)
+   Todos los estilos que se activan al añadir la clase .dark-mode
+   Cambia colores de fondo, texto, bordes y mueve la perilla
+
+📁 SECCIÓN 15: PÁGINA NOSOTROS (líneas 485-558)
+   Estilos para Misión, Visión y FODA (Fortalezas, Oportunidades,
+   Debilidades, Amenazas) con colores rojo, negro, blanco y gris
+
+📁 SECCIÓN 16: RESPONSIVE (líneas 560-580)
+   Adaptación a pantallas pequeñas (móviles y tablets)
+   Grid cambia a 1 columna, textos más pequeños
+
+============================================
+FUNCIONAMIENTO DEL MODO OSCURO:
+============================================
+Cuando se hace clic en el switch de tema:
+1. Se añade la clase "dark-mode" al <body>
+2. Las variables CSS cambian sus valores (!important)
+3. Todos los elementos con estilos dark-mode se activan
+4. La perilla del switch se mueve 30px a la derecha
+5. El fondo cambia de blanco (#f4f4f4) a negro (#111111)
+6. Los textos cambian de negro a blanco (#f4f4f4)
+
+============================================
+FUNCIONAMIENTO DEL SWITCH DE IDIOMA:
+============================================
+Cuando se hace clic en el switch de idioma:
+1. Se alterna entre ES y EN
+2. Se añade/remueve la clase "en-mode" al .lang-switch
+3. La perilla se mueve 40px a la derecha (EN) o izquierda (ES)
+4. Se carga el archivo JSON correspondiente (lang/es.json o lang/en.json)
+5. Se actualizan todos los elementos con data-translate
+
+============================================
